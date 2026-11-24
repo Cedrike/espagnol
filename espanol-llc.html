@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>¡A repasar! · Espagnol LLC</title>
+<style>
+:root{--blue:#1d3fa8;--ink:#14213d;--bg:#f3f6ff;--saf:#f2b01e;--ok:#1e9e6a;--bad:#e4572e;--mut:#6b7691;--line:#d9e0f5}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "Trebuchet MS","Segoe UI",system-ui,sans-serif}
+header{background:var(--blue);color:#fff}
+.top{max-width:680px;margin:0 auto;padding:10px 16px;display:flex;gap:12px;align-items:center}
+.logo{font:italic 700 21px Georgia,serif;cursor:pointer;flex:1;white-space:nowrap}
+.xp{flex:2;min-width:100px}.pill{font-size:12px;white-space:nowrap}
+.bar{height:8px;border-radius:4px;background:#ffffff40;overflow:hidden}.bar i{display:block;height:100%;background:var(--saf)}
+.bar.b2{background:var(--line);margin:2px 0 10px}.bar.b2 i{background:var(--blue)}
+.zz{height:12px;background:linear-gradient(135deg,var(--saf) 25%,transparent 25%) -6px 0/12px 12px,linear-gradient(225deg,var(--saf) 25%,transparent 25%) -6px 0/12px 12px,linear-gradient(315deg,var(--saf) 25%,transparent 25%) 0 0/12px 12px,linear-gradient(45deg,var(--saf) 25%,var(--blue) 25%) 0 0/12px 12px}
+main{max-width:680px;margin:0 auto;padding:8px 16px 40px}
+h2{font:italic 700 24px Georgia,serif;margin:18px 0 8px}
+.btn{font:inherit;border:2px solid var(--line);background:#fff;color:var(--ink);border-radius:12px;padding:11px 14px;cursor:pointer;text-align:left}
+.btn:hover:not(:disabled){border-color:var(--blue)}
+.btn:disabled{cursor:default;color:inherit}.btn.mod{display:block;width:100%;margin:10px 0}.btn.mod:disabled{opacity:.5}
+.btn.on{background:var(--blue);border-color:var(--blue);color:#fff}.btn.on small{color:#dfe6ff}
+.btn.chip{padding:7px 12px;border-radius:999px;font-size:14px}.btn.mini{padding:5px 10px;font-size:13px}
+.btn.go{background:var(--saf);border-color:var(--saf);font-weight:700;text-align:center;width:100%;margin-top:8px}
+.btn.ok{background:#dff5ea;border-color:var(--ok)}.btn.ko{background:#fde6df;border-color:var(--bad)}
+.lnk{font:inherit;font-size:13px;background:none;border:0;color:var(--blue);cursor:pointer;text-decoration:underline}
+:focus-visible{outline:3px solid var(--saf);outline-offset:2px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.card{background:#fff;border:2px solid var(--line);border-radius:16px;padding:16px 18px;margin:12px 0}
+.card.good{background:#eefaf4;border-color:var(--ok)}.card.wrong{background:#fff3ef;border-color:var(--bad)}
+.verb{font:italic 700 clamp(34px,9vw,50px)/1.15 Georgia,serif;color:var(--blue);margin:6px 0}
+.grid{display:grid;gap:10px;grid-template-columns:1fr 1fr;margin-top:10px}.grid .card{margin:0}
+@media(max-width:480px){.grid{grid-template-columns:1fr}}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.mut,small{color:var(--mut)}.hearts{color:var(--bad);letter-spacing:2px}
+.in{width:100%;font:inherit;font-size:22px;padding:11px 12px;border:2px solid var(--line);border-radius:12px;margin:8px 0}
+.acc{display:flex;gap:6px;margin-bottom:8px}.acc .btn{padding:6px 12px}
+.lock{opacity:.5}ol,ul{margin:6px 0;padding-left:20px}
+@media(prefers-reduced-motion:no-preference){.btn{transition:border-color .15s,background .15s}}
+.fiche h3{font:italic 700 18px Georgia,serif;color:var(--blue);margin:18px 0 4px}.fiche h3:first-child{margin-top:0}.fiche p,.fiche li{max-width:70ch}.fiche li{margin:4px 0}
+.ex{border-left:4px solid var(--saf);padding:4px 10px;background:#fffaf0;font-style:italic;margin:6px 0}.tw{overflow-x:auto;margin:8px 0}
+table{border-collapse:collapse;background:#fff;font-size:15px}th,td{border:1px solid var(--line);padding:5px 9px;text-align:left;vertical-align:top}th{background:#eaf0ff}
+.verb.sm{font-size:clamp(20px,5.5vw,28px);font-style:normal;line-height:1.3}
+</style>
+</head>
+<body>
+<header id="hd"></header><div class="zz"></div>
+<main id="app"></main>
+<script>
+(()=>{
+/* ============ OUTILS ============ */
+const $=s=>document.querySelector(s),rnd=a=>a[Math.floor(Math.random()*a.length)],
+shuf=a=>a.map(x=>[Math.random(),x]).sort((p,q)=>p[0]-q[0]).map(x=>x[1]),
+esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),
+ymd=d=>d.toLocaleDateString('sv');
+
+/* ============ MOTEUR DE CONJUGAISON ============ */
+const NM={á:'a',é:'e',í:'i',ó:'o',ú:'u'},ACC={a:'á',e:'é',i:'í',o:'ó',u:'ú'};
+const BT={ue:['o','ue'],ie:['e','ie'],i:['e','i'],jue:['u','ue'],u:['o','u']};
+const bs=(s,k)=>{const[a,b]=BT[k],i=s.lastIndexOf(a);return s.slice(0,i)+b+s.slice(i+1)};
+// changements orthographiques (c/qu, g/gu, z/c, g/j, gu/g, c/z)
+const sp=(s,e,inf)=>{const c=NM[e[0]]||e[0];
+ if('ao'.includes(c)){if(/g[ei]r$/.test(inf)&&s.endsWith('g'))s=s.slice(0,-1)+'j';else if(/guir$/.test(inf)&&s.endsWith('gu'))s=s.slice(0,-1);else if(/[^aeiou]c[ei]r$/.test(inf)&&s.endsWith('c'))s=s.slice(0,-1)+'z'}
+ else if('ei'.includes(c)&&/ar$/.test(inf)){if(s.endsWith('c'))s=s.slice(0,-1)+'qu';else if(s.endsWith('g'))s+='u';else if(s.endsWith('z'))s=s.slice(0,-1)+'c'}
+ return s+e};
+/* Ligne = [infinitif, français, drapeaux, exceptions]
+   drapeaux : ue ie i jue (diphtongue/affaiblissement) · zc · uy · r (pronominal)
+   exceptions : p présent, i indéfini, m imparfait, s subjonctif, t participe, x impératif tú,
+   ps radical de l'indéfini, fs radical du futur ('-' = forme régulière) */
+const SI='fui fuiste fue fuimos fuisteis fueron';
+const PON={p:'pongo - - - - -',ps:'pus',fs:'pondr',t:'puesto',x:'pon'};
+const IR={p:'voy vas va vamos vais van',i:SI,m:'iba ibas iba íbamos ibais iban',s:'vaya vayas vaya vayamos vayáis vayan',t:'ido',x:'ve'};
+const ROWS=[
+['hablar','parler'],['estudiar','étudier'],['trabajar','travailler'],['cantar','chanter'],['comprar','acheter'],['viajar','voyager'],['escuchar','écouter'],['mirar','regarder'],['ayudar','aider'],['necesitar','avoir besoin de'],['llevar','porter, emmener'],['llegar','arriver'],['buscar','chercher'],['tocar','toucher, jouer (instrument)'],['explicar','expliquer'],
+['empezar','commencer','ie'],['pensar','penser','ie'],['cerrar','fermer','ie'],['recordar','se rappeler','ue'],['encontrar','trouver','ue'],['contar','raconter, compter','ue'],['costar','coûter','ue'],['jugar','jouer','jue'],
+['dar','donner','',{p:'doy das da damos dais dan',i:'di diste dio dimos disteis dieron',s:'dé des dé demos deis den'}],
+['estar','être (état, lieu)','',{p:'estoy estás está estamos estáis están',ps:'estuv',s:'esté estés esté estemos estéis estén'}],
+['comer','manger'],['beber','boire'],['aprender','apprendre'],['comprender','comprendre'],['vender','vendre'],['leer','lire'],['creer','croire'],['correr','courir'],['deber','devoir'],['vencer','vaincre'],['escoger','choisir'],
+['entender','comprendre','ie'],['perder','perdre','ie'],['querer','vouloir, aimer','ie',{ps:'quis',fs:'querr'}],['poder','pouvoir','ue',{ps:'pud',fs:'podr'}],['volver','revenir','ue',{t:'vuelto'}],
+['conocer','connaître','zc'],['parecer','sembler','zc'],['ofrecer','offrir','zc'],
+['saber','savoir','',{p:'sé - - - - -',ps:'sup',fs:'sabr',s:'sepa sepas sepa sepamos sepáis sepan'}],
+['hacer','faire','',{p:'hago - - - - -',ps:'hic',fs:'har',t:'hecho',x:'haz'}],
+['poner','mettre','',PON],
+['tener','avoir (posséder)','ie',{p:'tengo - - - - -',ps:'tuv',fs:'tendr',x:'ten'}],
+['traer','apporter','',{p:'traigo - - - - -',ps:'traj'}],
+['caer','tomber','',{p:'caigo - - - - -'}],
+['ver','voir','',{p:'veo ves ve vemos veis ven',i:'vi viste vio vimos visteis vieron',m:'veía veías veía veíamos veíais veían',t:'visto',x:'ve'}],
+['ser','être (identité)','',{p:'soy eres es somos sois son',i:SI,m:'era eras era éramos erais eran',s:'sea seas sea seamos seáis sean',t:'sido',x:'sé'}],
+['vivir','vivre'],['escribir','écrire','',{t:'escrito'}],['abrir','ouvrir','',{t:'abierto'}],['recibir','recevoir'],['decidir','décider'],['descubrir','découvrir','',{t:'descubierto'}],
+['salir','sortir','',{p:'salgo - - - - -',fs:'saldr',x:'sal'}],
+['venir','venir','ie',{p:'vengo - - - - -',ps:'vin',fs:'vendr',x:'ven'}],
+['decir','dire','i',{p:'digo - - - - -',ps:'dij',fs:'dir',t:'dicho',x:'di'}],
+['ir','aller','',IR],
+['dormir','dormir','ue'],['sentir','sentir, regretter','ie'],['pedir','demander','i'],['seguir','suivre','i'],['servir','servir','i'],['repetir','répéter','i'],['elegir','choisir','i'],['morir','mourir','ue',{t:'muerto'}],
+['construir','construire','uy'],['conducir','conduire','zc',{ps:'conduj'}],['traducir','traduire','zc',{ps:'traduj'}],
+['levantarse','se lever','r'],['acostarse','se coucher','ue r'],['llamarse','s’appeler','r'],['despertarse','se réveiller','ie r'],['sentarse','s’asseoir','ie r'],['ponerse','mettre (vêtement), devenir','r',PON],['irse','s’en aller','r',IR],['quedarse','rester','r'],['divertirse','s’amuser','ie r'],['vestirse','s’habiller','i r'],['sentirse','se sentir','ie r'],['acordarse','se souvenir','ue r']
+];
+function build(row){
+ const[inf0,fr,fl='',ov={}]=row,F=fl.split(' '),R=F.includes('r'),inf=R?inf0.slice(0,-2):inf0,
+ E=inf.endsWith('ar')?0:inf.endsWith('er')?1:2,st=inf.slice(0,-2),bt=F.find(f=>BT[f]),uy=F.includes('uy'),zc=F.includes('zc'),
+ boot=bt?bs(st,bt):st,weak=bt&&E==2?bs(st,bt=='ue'?'u':'i'):st,
+ val=(k,n)=>{const a=ov[k]&&ov[k].split(' ')[n];return a&&a!='-'?a:null},
+ y0=val('p',0)&&val('p',0).slice(0,-1),C=['me','te','se','nos','os','se'],
+ B=n=>[0,1,2,5].includes(n),Z=st.slice(0,-1)+'zc',
+ pe=[['o','as','a','amos','áis','an'],['o','es','e','emos','éis','en'],['o','es','e','imos','ís','en']][E],
+ pres=pe.map((e,n)=>val('p',n)||sp(zc&&n==0?Z:B(n)?(uy?st+'y':boot):st,e,inf)),
+ sy=n=>y0||(zc?Z:uy?st+'y':B(n)?boot:E==2?weak:st),
+ subj=(E?['a','as','a','amos','áis','an']:['e','es','e','emos','éis','en']).map((e,n)=>val('s',n)||sp(sy(n),e,inf)),
+ ps=ov.ps,vowel=E>0&&/[aeo]$/.test(st),uir=/[^gq]uir$/.test(inf),
+ ind=[0,1,2,3,4,5].map(n=>{if(val('i',n))return val('i',n);
+  if(ps){const e=['e','iste','o','imos','isteis',ps.endsWith('j')?'eron':'ieron'][n];return ps.endsWith('c')&&n==2?ps.slice(0,-1)+'zo':ps+e}
+  if(!E)return sp(st,['é','aste','ó','amos','asteis','aron'][n],inf);
+  if((vowel||uir)&&(n==2||n==5))return st+(n==2?'yó':'yeron');
+  if(vowel&&n!=2&&n!=5)return st+['í','íste',0,'ímos','ísteis'][n];
+  return sp(bt&&E==2&&(n==2||n==5)?weak:st,['í','iste','ió','imos','isteis','ieron'][n],inf)}),
+ imf=[0,1,2,3,4,5].map(n=>val('m',n)||st+(E?['ía','ías','ía','íamos','íais','ían']:['aba','abas','aba','ábamos','abais','aban'])[n]),
+ fs=ov.fs||inf,part=ov.t||(vowel?st+'ído':st+(E?'ido':'ado')),
+ hp=['he','has','ha','hemos','habéis','han'],hi=['había','habías','había','habíamos','habíais','habían'],
+ isub=[0,1,2,3,4,5].map(n=>{const s=ind[5].slice(0,-3);return(n==3?s.slice(0,-1)+ACC[s.slice(-1)]:s)+['ra','ras','ra','ramos','rais','ran'][n]}),
+ w=a=>a.map((f,n)=>(R?C[n]+' ':'')+f);
+ return{inf:inf0,fr,r:R,irr:!!(Object.keys(ov).length||F.some(f=>f&&f!='r')||/([cgz]ar|[gc]er|gir|guir)$/.test(inf)),
+  pres:w(pres),indef:w(ind),imperf:w(imf),perf:w(hp.map(h=>h+' '+part)),plus:w(hi.map(h=>h+' '+part)),
+  fut:w(['é','ás','á','emos','éis','án'].map(e=>fs+e)),cond:w(['ía','ías','ía','íamos','íais','ían'].map(e=>fs+e)),
+  subj:w(subj),isubj:w(isub),imp:R?null:[ov.x||pres[2],subj[2],subj[3],inf.slice(0,-1)+'d',subj[5]]}}
+const VERBS=ROWS.map(build);
+const TN=[['pres','Presente de indicativo'],['indef','Pretérito indefinido'],['imperf','Pretérito imperfecto'],['perf','Pretérito perfecto'],['plus','Pluscuamperfecto'],['fut','Futuro simple'],['cond','Condicional simple'],['subj','Presente de subjuntivo'],['isubj','Imperfecto de subjuntivo'],['imp','Imperativo afirmativo']];
+const TF=Object.fromEntries(TN),PL=['yo','tú','él / ella / usted','nosotros','vosotros','ellos / ellas / ustedes'],IL=['tú','usted','nosotros','vosotros','ustedes'];
+
+/* ============ MODULES ============
+ Pour ajouter une thématique : ajouter un objet à MODS avec
+ {id,name,icon,desc,filters:[{id,label,multi?,items:[[clé,libellé],…]}], gen(sel){ return ()=>question }}
+ question = {p:mot affiché, s:sous-titre, h:consigne, pr:étiquette, a:réponse, tag:clé de stat, tl:libellé de stat, ds:()=>[3 mauvaises réponses]}
+ Les 4 types d'exercices, l'XP, les vies, les badges et le profil fonctionnent alors automatiquement. */
+const MODS=[
+{id:'conj',name:'Conjugaison',icon:'🗣️',desc:'10 temps et modes · '+VERBS.length+' verbes',
+ filters:[{id:'t',label:'Temps et modes à travailler',multi:1,items:TN},{id:'v',label:'Verbes',items:[['all','Tous'],['reg','Réguliers'],['irr','Irréguliers'],['pro','Pronominaux']]}],
+ gen(sel){const vs=VERBS.filter(v=>sel.v=='all'||(sel.v=='pro'?v.r:sel.v=='irr'?v.irr&&!v.r:!v.irr&&!v.r));
+  return()=>{let v,k,i=0;do{v=rnd(vs);k=rnd(sel.t)}while(k=='imp'&&v.r&&++i<60);if(k=='imp'&&v.r)k='pres';
+   const n=Math.floor(Math.random()*v[k].length),a=v[k][n],lab=k=='imp'?IL[n]:PL[n];
+   return{p:v.inf,s:v.fr,h:TF[k]+' · '+lab,pr:lab,a,tag:k,tl:TF[k],
+    ds:()=>{const same=v[k].filter((_,j)=>j!=n),oth=TN.filter(t=>t[0]!=k&&v[t[0]]).map(t=>v[t[0]][Math.min(n,v[t[0]].length-1)]);
+     return[...shuf(same).slice(0,2),...shuf(oth)].filter((x,j,ar)=>x!=a&&ar.indexOf(x)==j).slice(0,3)}}}}},
+{id:'voc',name:'Vocabulaire',icon:'📚',desc:'Bientôt',soon:1},
+{id:'civ',name:'Civilisation et culture',icon:'🌎',desc:'Bientôt',soon:1}
+];
+
+/* ============ FICHES LEÇONS (conjugaison) ============ */
+const P6=['yo','tú','él / ella / usted','nosotros','vosotros','ellos / ellas / ustedes'];
+const tb=(h,r)=>`<div class="tw"><table><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr>${r.map(l=>`<tr>${l.map((x,i)=>i?`<td>${x}</td>`:`<th>${x}</th>`).join('')}</tr>`).join('')}</table></div>`;
+const en=(a,b,c)=>tb(['','-ar','-er','-ir'],P6.map((p,i)=>[p,a[i],b[i],c[i]]));
+const en1=(a,h)=>tb(['',h||'Terminaison'],P6.map((p,i)=>[p,a[i]]));
+const ex=s=>`<p class="ex">${s}</p>`;
+const LESSONS=[
+{id:'pres',g:'Temps et modes',t:'Presente de indicativo',h:`<h3>Quand l’employer</h3><p>Habitudes, états actuels, vérités générales, et futur proche quand un marqueur de temps l’indique.</p>${ex('Los sábados <b>juego</b> al fútbol. · Mañana <b>salimos</b> temprano.')}
+<h3>Terminaisons régulières</h3>${en(['-o','-as','-a','-amos','-áis','-an'],['-o','-es','-e','-emos','-éis','-en'],['-o','-es','-e','-imos','-ís','-en'])}
+<h3>Irréguliers à connaître</h3><ul><li><b>Diphtongue ou affaiblissement</b> (sauf nosotros et vosotros) : pensar → <i>pienso</i>, poder → <i>puedo</i>, pedir → <i>pido</i>. Voir la fiche « Verbes à alternance ».</li><li><b>1re personne en -go</b> : tener <i>tengo</i>, hacer <i>hago</i>, poner <i>pongo</i>, salir <i>salgo</i>, venir <i>vengo</i>, decir <i>digo</i>, traer <i>traigo</i>, caer <i>caigo</i>.</li><li><b>1re personne en -zco</b> : conocer <i>conozco</i>, parecer <i>parezco</i>, conducir <i>conduzco</i>.</li><li><b>Autres</b> : saber <i>sé</i>, dar <i>doy</i>, ver <i>veo</i>.</li></ul>
+${tb(['','ser','estar','ir'],[['yo','soy','estoy','voy'],['tú','eres','estás','vas'],['él / ella','es','está','va'],['nosotros','somos','estamos','vamos'],['vosotros','sois','estáis','vais'],['ellos','son','están','van']])}`},
+{id:'indef',g:'Temps et modes',t:'Pretérito indefinido',h:`<h3>Quand l’employer</h3><p>Action terminée, datée ou délimitée dans le passé ; événements qui se succèdent. Marqueurs : ayer, anoche, el año pasado, en 2020, hace dos días.</p>${ex('Ayer <b>comí</b> con mi abuela y después <b>volví</b> a casa.')}
+<h3>Terminaisons régulières</h3>${en(['-é','-aste','-ó','-amos','-asteis','-aron'],['-í','-iste','-ió','-imos','-isteis','-ieron'],['-í','-iste','-ió','-imos','-isteis','-ieron'])}<p>Attention aux accents de <i>yo</i> et <i>él</i> (hablé, habló). Au nosotros, les verbes en -ar sont identiques au présent (hablamos).</p>
+<h3>Changements orthographiques</h3><p>Devant -é (yo, verbes en -ar) : <i>busqué, llegué, empecé</i>. Voyelle + -ió / -ieron : <i>leyó, leyeron, creyó, cayó, construyó</i>.</p>
+<h3>Verbes en -ir à alternance</h3><p>Seulement aux 3es personnes (e→i, o→u) : <i>pidió / pidieron</i>, <i>sintió / sintieron</i>, <i>durmió / durmieron</i>, <i>murió</i>.</p>
+<h3>Radicaux irréguliers</h3><p>Terminaisons <b>sans accent</b> : -e, -iste, -o, -imos, -isteis, -ieron (<b>-eron</b> après un j).</p>
+${tb(['Infinitif','Radical','yo / él'],[['estar','estuv-','estuve / estuvo'],['tener','tuv-','tuve / tuvo'],['poder','pud-','pude / pudo'],['poner','pus-','puse / puso'],['saber','sup-','supe / supo'],['querer','quis-','quise / quiso'],['venir','vin-','vine / vino'],['hacer','hic-','hice / <b>hizo</b>'],['decir','dij-','dije / dijo (ellos : dijeron)'],['traer','traj-','traje / trajo (ellos : trajeron)'],['conducir','conduj-','conduje / condujo']])}
+${tb(['','ser / ir','dar','ver'],[['yo','fui','di','vi'],['tú','fuiste','diste','viste'],['él','fue','dio','vio'],['nosotros','fuimos','dimos','vimos'],['vosotros','fuisteis','disteis','visteis'],['ellos','fueron','dieron','vieron']])}<p>Ser et ir ont les mêmes formes : le contexte décide (<i>Fui a Madrid</i> / <i>Fui profesor</i>).</p>`},
+{id:'imperf',g:'Temps et modes',t:'Pretérito imperfecto',h:`<h3>Quand l’employer</h3><p>Habitudes passées, descriptions (décor, âge, heure), action en cours ou en arrière-plan, actions simultanées. Marqueurs : siempre, a menudo, todos los días, de niño, mientras.</p>${ex('De niño <b>jugaba</b> en la calle. · Cuando llegué, <b>llovía</b>.')}
+<h3>Terminaisons</h3>${en(['-aba','-abas','-aba','-ábamos','-abais','-aban'],['-ía','-ías','-ía','-íamos','-íais','-ían'],['-ía','-ías','-ía','-íamos','-íais','-ían'])}
+<h3>Seulement trois irréguliers</h3>${tb(['','ser','ir','ver'],[['yo','era','iba','veía'],['tú','eras','ibas','veías'],['él','era','iba','veía'],['nosotros','éramos','íbamos','veíamos'],['vosotros','erais','ibais','veíais'],['ellos','eran','iban','veían']])}<p>Les verbes à alternance (pensar, poder…) sont <b>réguliers</b> à l’imparfait : <i>pensaba, podía</i>.</p>`},
+{id:'perf',g:'Temps et modes',t:'Pretérito perfecto',h:`<h3>Quand l’employer</h3><p>Passé relié au présent. Marqueurs : hoy, esta mañana, este año, ya, todavía no, nunca, alguna vez. En Amérique latine, l’indefinido le remplace souvent.</p>${ex('Hoy <b>he desayunado</b> tarde. · Todavía no <b>hemos visto</b> la película.')}
+<h3>Formation : haber au présent + participe passé</h3>${en1(['he','has','ha','hemos','habéis','han'],'haber')}<p>Participe régulier : -ar → <b>-ado</b>, -er / -ir → <b>-ido</b>. Il est <b>invariable</b> ici. On ne sépare pas haber du participe, et le pronom se place avant : <i>me he levantado</i>.</p>
+<h3>Participes irréguliers</h3>${tb(['Verbe','Participe'],[['abrir','abierto'],['decir','dicho'],['escribir','escrito'],['hacer','hecho'],['poner','puesto'],['ver','visto'],['volver','vuelto'],['romper','roto'],['morir','muerto'],['descubrir','descubierto'],['leer, creer, caer, traer','leído, creído, caído, traído (accent)']])}`},
+{id:'plus',g:'Temps et modes',t:'Pluscuamperfecto',h:`<h3>Quand l’employer</h3><p>Action antérieure à une autre action passée ; discours rapporté au passé.</p>${ex('Cuando llegué, ya <b>se habían ido</b>. · Dijo que <b>había terminado</b>.')}
+<h3>Formation : haber à l’imparfait + participe passé</h3>${en1(['había','habías','había','habíamos','habíais','habían'],'haber')}<p>Mêmes participes que le pretérito perfecto (hecho, dicho, visto…).</p>`},
+{id:'fut',g:'Temps et modes',t:'Futuro simple',h:`<h3>Quand l’employer</h3><p>Action à venir (plus formel que <i>ir a + infinitif</i>), hypothèse sur le présent (<i>Serán las ocho</i>), et dans la principale après <i>si + présent</i>.</p>${ex('Si tengo tiempo, <b>iré</b> al cine. · Mañana <b>hablaremos</b>.')}
+<h3>Formation : infinitif + terminaisons</h3>${en1(['-é','-ás','-á','-emos','-éis','-án'])}<p>Les terminaisons sont les mêmes pour les trois groupes. Après <i>cuando</i> ou <i>en cuanto</i> pour le futur, on emploie le <b>subjonctif</b> : <i>Cuando llegues, te llamaré.</i></p>
+<h3>Radicaux irréguliers (mêmes terminaisons)</h3>${tb(['Infinitif','Radical','Exemple'],[['tener','tendr-','tendré'],['venir','vendr-','vendré'],['poner','pondr-','pondré'],['salir','saldr-','saldré'],['poder','podr-','podré'],['querer','querr-','querré'],['saber','sabr-','sabré'],['haber','habr-','habrá'],['hacer','har-','haré'],['decir','dir-','diré']])}`},
+{id:'cond',g:'Temps et modes',t:'Condicional simple',h:`<h3>Quand l’employer</h3><p>Politesse, conseil, souhait, hypothèse irréelle, futur dans le passé.</p>${ex('¿<b>Podrías</b> ayudarme? · <b>Deberías</b> descansar. · Dijo que <b>vendría</b>.')}
+<h3>Formation : infinitif + terminaisons de l’imparfait en -ía</h3>${en1(['-ía','-ías','-ía','-íamos','-íais','-ían'])}<p>Mêmes radicaux irréguliers que le futur : <i>tendría, haría, diría, sabría, podría, querría, saldría, vendría, pondría</i>.</p>
+<h3>Hypothèse irréelle</h3><p><b>si + imperfecto de subjuntivo</b>, puis <b>condicional</b>. Jamais de conditionnel après <i>si</i>.</p>${ex('Si <b>tuviera</b> dinero, <b>viajaría</b> por todo el mundo.')}`},
+{id:'subj',g:'Temps et modes',t:'Presente de subjuntivo',h:`<h3>Formation</h3><p>On part de la <b>1re personne du présent</b>, on retire -o, et on ajoute les terminaisons « inversées » : -ar prend <b>e</b>, -er / -ir prennent <b>a</b>.</p>${en(['-e','-es','-e','-emos','-éis','-en'],['-a','-as','-a','-amos','-áis','-an'],['-a','-as','-a','-amos','-áis','-an'])}
+<ul><li><b>-go et -zco</b> se conservent partout : <i>tenga, haga, diga, salga, venga, conozca</i>.</li><li><b>Alternance</b> : comme au présent (<i>piense, pensemos</i>), mais les -ir affaiblissent à nosotros et vosotros : <i>sintamos, durmamos, pidamos</i>.</li><li><b>Orthographe</b> : <i>busque, llegue, empiece, escoja</i>.</li></ul>
+<h3>Irréguliers</h3>${tb(['','ser','ir','saber','estar','dar'],[['yo','sea','vaya','sepa','esté','dé'],['tú','seas','vayas','sepas','estés','des'],['él','sea','vaya','sepa','esté','dé'],['nosotros','seamos','vayamos','sepamos','estemos','demos'],['vosotros','seáis','vayáis','sepáis','estéis','deis'],['ellos','sean','vayan','sepan','estén','den']])}
+<h3>Quand l’employer</h3><ul><li><b>Volonté, ordre, demande</b> : quiero que, espero que, pido que.</li><li><b>Sentiment</b> : me alegro de que, es una pena que.</li><li><b>Doute, négation</b> : dudo que, no creo que.</li><li><b>Impersonnel</b> : es importante que, es posible que.</li><li><b>But et temps futur</b> : para que, cuando, hasta que, en cuanto (futur). Aussi <i>ojalá</i>, <i>quizás</i>.</li></ul>${ex('Quiero que <b>vengas</b>. · Cuando <b>llegues</b>, llámame.')}<p>Même sujet : on garde l’infinitif (<i>Quiero salir</i>). Certitude : indicatif (<i>Creo que viene</i>).</p>`},
+{id:'isubj',g:'Temps et modes',t:'Imperfecto de subjuntivo',h:`<h3>Formation</h3><p>3e personne du pluriel de l’<b>indefinido</b>, on retire <b>-ron</b>, on ajoute les terminaisons ci-dessous (accent sur la voyelle précédente à nosotros).</p>${en1(['-ra','-ras','-ra','-ramos','-rais','-ran'])}
+${tb(['Indefinido (ellos)','Radical','nosotros'],[['hablaron','habla-','habláramos'],['comieron','comie-','comiéramos'],['tuvieron','tuvie-','tuviéramos'],['dijeron','dije-','dijéramos'],['fueron','fue-','fuéramos'],['pidieron','pidie-','pidiéramos']])}<p>La forme en <b>-se</b> existe aussi (<i>hablase, tuviese</i>) et se forme de la même façon.</p>
+<h3>Quand l’employer</h3><ul><li>Mêmes déclencheurs que le subjonctif présent, mais le verbe principal est <b>au passé ou au conditionnel</b> : <i>Quería que vinieras</i>, <i>Me gustaría que vinieras</i>.</li><li><b>Hypothèse irréelle</b> : <i>Si tuviera tiempo, iría.</i> (principale au conditionnel).</li><li><i>Como si</i> + imperfecto de subjuntivo : <i>Habla como si fuera el jefe.</i></li></ul>`},
+{id:'imp',g:'Temps et modes',t:'Imperativo afirmativo',h:`<h3>Formation</h3>${tb(['Personne','Règle','Exemple'],[['tú','3e personne du présent','habla, come, escribe'],['usted','subjonctif présent','hable, coma'],['nosotros','subjonctif présent','hablemos, comamos'],['vosotros','infinitif, -r devient -d','hablad, comed, escribid'],['ustedes','subjonctif présent','hablen, coman']])}
+<h3>Tú irréguliers</h3>${tb(['decir','hacer','ir','poner','salir','ser','tener','venir'],[['di','haz','ve','pon','sal','sé','ten','ven']])}
+<h3>Pronoms et négation</h3><ul><li>À l’affirmatif, les pronoms se <b>collent</b> au verbe, avec accent si nécessaire : <i>dímelo, levántate, siéntense</i>. Vosotros pronominal : <i>levantaos</i> (le d tombe), <i>idos</i> pour irse.</li><li>À la forme négative, on emploie le <b>subjonctif</b> pour toutes les personnes et les pronoms passent avant : <i>no hables, no digas, no te levantes</i>.</li></ul>${ex('<b>Ven</b> aquí y <b>dime</b> la verdad. · No <b>te vayas</b>.')}`},
+{id:'passes',g:'Règles transversales',t:'Choisir le bon passé',h:`${tb(['','Indefinido','Imperfecto','Perfecto'],[['Idée','action terminée, datée','habitude, décor, arrière-plan','passé relié au présent'],['Marqueurs','ayer, anoche, el año pasado, en 2019, hace dos días','siempre, a menudo, de niño, mientras, todos los días','hoy, esta mañana, este año, ya, todavía no, nunca'],['Exemple','Ayer comí paella.','De niño comía paella.','Hoy he comido paella.']])}
+<h3>Dans un récit</h3><p>L’<b>imperfecto</b> plante le décor ; l’<b>indefinido</b> fait avancer l’histoire ; le <b>pluscuamperfecto</b> raconte ce qui s’est passé avant.</p>${ex('Era de noche y <b>llovía</b>. <b>Llegué</b> a casa y vi que mi hermana ya <b>se había acostado</b>.')}`},
+{id:'orto',g:'Règles transversales',t:'Changements orthographiques',h:`<p>Ils servent à garder le <b>même son</b> du radical.</p>${tb(['Règle','Exemples'],[['-car → qu devant e','buscar : busqué, busque'],['-gar → gu devant e','llegar : llegué, llegue'],['-zar → c devant e','empezar : empecé, empiece'],['-ger / -gir → j devant o, a','escoger : escojo, escoja · elegir : elijo'],['-cer / -cir après consonne → z devant o, a','vencer : venzo, venza'],['-guir → g devant o, a','seguir : sigo, siga'],['-cer / -cir après voyelle → zc devant o, a','conocer : conozco, conozca'],['i entre deux voyelles → y','leer : leyó, leyeron · construir : construyó, construyo']])}`},
+{id:'alt',g:'Règles transversales',t:'Verbes à alternance',h:`${tb(['','pensar (e→ie)','poder (o→ue)','pedir (e→i)'],[['yo','pienso','puedo','pido'],['tú','piensas','puedes','pides'],['él','piensa','puede','pide'],['nosotros','pensamos','podemos','pedimos'],['vosotros','pensáis','podéis','pedís'],['ellos','piensan','pueden','piden']])}
+<h3>Où apparaît l’alternance</h3><ul><li><b>Présent</b> de l’indicatif et du subjonctif : toutes les personnes <b>sauf nosotros et vosotros</b>.</li><li><b>Indefinido</b> : seulement les <b>-ir</b>, aux 3es personnes (<i>sintió, durmió, pidió</i>).</li><li><b>Subjonctif des -ir</b> : nosotros et vosotros s’affaiblissent (<i>sintamos, durmamos, pidamos</i>).</li><li><b>Jamais</b> à l’imparfait, au futur ni au conditionnel.</li></ul>
+<h3>Listes à retenir</h3><ul><li><b>e→ie</b> : empezar, pensar, cerrar, entender, perder, querer, sentir, tener, venir, despertarse, sentarse, divertirse</li><li><b>o→ue</b> : recordar, encontrar, contar, costar, poder, volver, dormir, morir, acostarse, acordarse</li><li><b>e→i</b> (verbes en -ir) : pedir, seguir, servir, repetir, elegir, decir, vestirse</li><li><b>u→ue</b> : jugar</li></ul>`},
+{id:'pron',g:'Règles transversales',t:'Verbes pronominaux',h:`${tb(['','Pronom','Exemple'],[['yo','me','me levanto'],['tú','te','te levantas'],['él / ella / usted','se','se levanta'],['nosotros','nos','nos levantamos'],['vosotros','os','os levantáis'],['ellos / ellas / ustedes','se','se levantan']])}
+<h3>Place du pronom</h3><ul><li>Avant le verbe conjugué, et avant <i>haber</i> aux temps composés : <i>me he levantado</i>.</li><li>Avec un infinitif ou un gérondif : avant le verbe conjugué ou collé à l’infinitif : <i>Me voy a levantar</i> = <i>Voy a levantarme</i>.</li><li>À l’impératif affirmatif : collé (<i>levántate</i>) ; au négatif : avant (<i>no te levantes</i>).</li></ul>
+<h3>Sens</h3><ul><li>Réfléchi : <i>levantarse, vestirse, llamarse</i>.</li><li>Changement de sens : <i>ir / irse</i> (s’en aller), <i>dormir / dormirse</i> (s’endormir), <i>poner / ponerse</i> (mettre un vêtement, devenir).</li><li>Réciproque (pluriel) : <i>Se quieren mucho.</i></li></ul>`}
+];
+MODS[0].lessons=LESSONS;
+
+/* ---- Phrases à trous : [phrase, infinitif, temps, personne] ; la réponse vient du moteur de conjugaison ---- */
+const SENT=[
+['Todos los días yo ___ a las siete.','despertarse','pres',0],['Mis padres ___ en Madrid desde 2010.','vivir','pres',5],['Mi hermano siempre ___ tarde los domingos.','levantarse','pres',2],
+['Ayer nosotros ___ al cine.','ir','indef',3],['El año pasado ella ___ a Sevilla.','viajar','indef',2],['Anoche yo no ___ dormir.','poder','indef',0],['Hace dos días ellos ___ la verdad.','decir','indef',5],['Ayer tú ___ muy tarde.','llegar','indef',1],['Ayer nosotros ___ muy tarde.','acostarse','indef',3],
+['Cuando era niño, yo ___ en el pueblo.','vivir','imperf',0],['Mientras ella cocinaba, nosotros ___ la mesa.','poner','imperf',3],['Antes mis abuelos siempre ___ a la playa.','ir','imperf',5],['Cuando llegué, todos ___ la tele.','ver','imperf',5],
+['Esta mañana yo ___ muy temprano.','levantarse','perf',0],['Todavía no ___ los deberes (nosotros).','hacer','perf',3],['Nunca ___ a México (yo).','ir','perf',0],['Hoy ellos ___ una carta.','escribir','perf',5],
+['Cuando llegamos al cine, la película ya ___.','empezar','plus',2],['Dijo que nunca ___ en avión (él).','viajar','plus',2],['Cuando llamó, yo ya ___.','salir','plus',0],
+['Mañana nosotros ___ a Madrid.','viajar','fut',3],['El año que viene yo ___ veinte años.','tener','fut',0],['Si hace buen tiempo, ellos ___ de excursión.','salir','fut',5],['Dentro de un mes ella me lo ___.','decir','fut',2],
+['Con más dinero, yo ___ por el mundo.','viajar','cond',0],['Dijo que ___ a las ocho (él).','venir','cond',2],['¿___ ayudarme, por favor (tú)?','poder','cond',1],['Yo en tu lugar no ___ nada.','decir','cond',0],
+['Quiero que tú ___ conmigo.','venir','subj',1],['Es importante que nosotros ___ la verdad.','saber','subj',3],['Dudo que ella ___ tiempo.','tener','subj',2],['Cuando ___ a Madrid, te llamaré (yo).','llegar','subj',0],['Quiero que vosotros ___ conmigo.','comer','subj',4],['No creo que ellos ___ a mi hermana.','conocer','subj',5],
+['Si ___ más tiempo, estudiaría más (yo).','tener','isubj',0],['Quería que tú ___ con nosotros.','venir','isubj',1],['Me gustaría que ellos ___ más.','leer','isubj',5],['Si yo ___ rico, viviría en una isla.','ser','isubj',0],['Habla como si ___ en su casa (él).','estar','isubj',2],
+['¡___ aquí ahora mismo, por favor (tú)!','venir','imp',0],['¡___ la puerta (vosotros)!','cerrar','imp',3],['Por favor, ___ la ventana (usted).','abrir','imp',1],['¡___ a casa (nosotros)!','ir','imp',2],['___ la verdad (tú).','decir','imp',0]];
+const dsf=(v,k,n,a)=>{const same=v[k].filter((_,j)=>j!=n),oth=TN.filter(t=>t[0]!=k&&v[t[0]]).map(t=>v[t[0]][Math.min(n,v[t[0]].length-1)]);return[...shuf(same).slice(0,2),...shuf(oth)].filter((x,j,ar)=>x!=a&&ar.indexOf(x)==j).slice(0,3)};
+const ctxGen=sel=>{let L=SENT.filter(x=>sel.t.includes(x[2]));
+ const ok=x=>{const v=VERBS.find(y=>y.inf==x[1]);return sel.v=='all'||(sel.v=='pro'?v.r:sel.v=='irr'?v.irr&&!v.r:!v.irr&&!v.r)},L2=L.filter(ok);L=L2.length?L2:L.length?L:SENT;
+ return()=>{const[t,inf,k,n]=rnd(L),v=VERBS.find(y=>y.inf==inf),a=v[k][n];return{p:t,sm:1,s:inf+' · '+v.fr,h:'Complète la phrase',pr:'…',a,tag:k,tl:TF[k],note:TF[k],ds:()=>dsf(v,k,n,a)}}};
+const g0=MODS[0].gen;MODS[0].gen=sel=>{const a=g0(sel),b=ctxGen(sel);return sel.f=='ctx'?b:sel.f=='mix'?()=>Math.random()<.5?a():b():a};
+MODS[0].filters.push({id:'f',label:'Format des questions',items:[['ctx','Phrases à trous'],['iso','Formes isolées'],['mix','Les deux']]});
+
+/* ---- Vocabulaire et connecteurs : [espagnol, français, groupe] (« / » sépare les variantes acceptées) ---- */
+const VG=[['conn','Connecteurs logiques'],['avis','Avis et nuances'],['anal','Analyser un document'],['soc','Société et culture'],['t1','Thématique 1 · Imaginaires et réalités'],['t2','Thématique 2 · Dominations et insoumissions'],['t3','Thématique 3 · Espagne et Amérique latine dans le monde']];
+const VOC=[
+['por lo tanto / así que','donc / par conséquent','conn'],['sin embargo / no obstante','cependant / néanmoins','conn'],['aunque','bien que / même si','conn'],['a pesar de','malgré','conn'],['porque / ya que','parce que / puisque','conn'],['debido a / a causa de','à cause de / en raison de','conn'],['con el fin de','afin de','conn'],['en cambio','en revanche','conn'],['mientras que','alors que / tandis que','conn'],['además / asimismo','de plus / en outre','conn'],['por una parte','d’une part','conn'],['por otra parte','d’autre part','conn'],['en primer lugar','tout d’abord','conn'],['por último / finalmente','enfin / pour finir','conn'],['en conclusión / en definitiva','en conclusion / en définitive','conn'],['es decir','c’est-à-dire','conn'],['por ejemplo','par exemple','conn'],['de hecho','en fait','conn'],['en efecto','en effet','conn'],['por eso / por ello','c’est pourquoi / pour cela','conn'],
+['en mi opinión / a mi parecer','à mon avis / selon moi','avis'],['desde mi punto de vista','de mon point de vue','avis'],['creo que / pienso que','je crois que / je pense que','avis'],['estoy de acuerdo con','je suis d’accord avec','avis'],['no estoy de acuerdo','je ne suis pas d’accord','avis'],['me parece que','il me semble que','avis'],['cabe destacar que','il convient de souligner que','avis'],['hay que tener en cuenta','il faut tenir compte de','avis'],['no cabe duda de que','il ne fait aucun doute que','avis'],['es cierto que','il est vrai que','avis'],['sin duda','sans aucun doute','avis'],['según el texto','selon le texte','avis'],
+['el texto trata de','le texte traite de','anal'],['el autor denuncia','l’auteur dénonce','anal'],['el narrador','le narrateur','anal'],['el personaje','le personnage','anal'],['la imagen muestra','l’image montre','anal'],['en primer plano','au premier plan','anal'],['al fondo','à l’arrière-plan / au fond','anal'],['la trama / el argumento','l’intrigue','anal'],['el ambiente / la atmósfera','l’ambiance / l’atmosphère','anal'],['la mirada','le regard','anal'],['destacar / resaltar','souligner / mettre en évidence','anal'],['reflejar','refléter','anal'],['evocar','évoquer','anal'],['plantear','poser / soulever','anal'],['el mensaje','le message','anal'],['el fragmento / el extracto','l’extrait','anal'],
+['la identidad','l’identité','soc'],['la memoria','la mémoire','soc'],['el exilio','l’exil','soc'],['la frontera','la frontière','soc'],['la desigualdad','l’inégalité','soc'],['la inmigración','l’immigration','soc'],['el patrimonio','le patrimoine','soc'],['el mestizaje','le métissage','soc'],['la dictadura','la dictature','soc'],['la libertad','la liberté','soc'],['el derecho','le droit','soc'],['la lucha','la lutte','soc'],['la huelga','la grève','soc'],['el desafío','le défi','soc'],['la juventud','la jeunesse','soc'],['el pueblo','le peuple / le village','soc'],['el cambio climático','le changement climatique','soc'],['la brecha','le fossé','soc'],
+['el mito','le mythe','t1'],['la leyenda','la légende','t1'],['la naturaleza','la nature','t1'],['el paisaje','le paysage','t1'],['la selva','la jungle / la forêt tropicale','t1'],['el realismo mágico','le réalisme magique','t1'],['el imaginario','l’imaginaire','t1'],['el estereotipo','le stéréotype','t1'],['el tópico','le cliché / le lieu commun','t1'],['el gaucho','le gaucho','t1'],['la gitana','la gitane','t1'],['el torero','le torero','t1'],['el bandolero','le bandit de grand chemin','t1'],['el indígena','l’indigène / l’autochtone','t1'],['el folclore','le folklore','t1'],['la costumbre','la coutume / l’habitude','t1'],['idealizar','idéaliser','t1'],['deformar','déformer','t1'],['encarnar','incarner','t1'],['fingir','feindre / faire semblant','t1'],
+['la opresión','l’oppression','t2'],['la resistencia','la résistance','t2'],['la revuelta / la rebelión','la révolte / la rébellion','t2'],['la revolución','la révolution','t2'],['la ruptura','la rupture','t2'],['el dictador','le dictateur','t2'],['el régimen','le régime','t2'],['la censura','la censure','t2'],['la represión','la répression','t2'],['someter','soumettre','t2'],['rebelarse / sublevarse','se rebeller / se soulever','t2'],['el poder','le pouvoir','t2'],['la desobediencia','la désobéissance','t2'],['la guerra civil','la guerre civile','t2'],['el franquismo','le franquisme','t2'],['la transición','la transition','t2'],['los desaparecidos','les disparus','t2'],['la tortura','la torture','t2'],['la emancipación','l’émancipation','t2'],['la propaganda','la propagande','t2'],['la clandestinidad','la clandestinité','t2'],['la esclavitud','l’esclavage','t2'],['el levantamiento','le soulèvement','t2'],
+['la globalización','la mondialisation','t3'],['la influencia','l’influence','t3'],['el intercambio','l’échange','t3'],['el migrante','le migrant','t3'],['cruzar la frontera','traverser la frontière','t3'],['el muro','le mur','t3'],['la crisis económica','la crise économique','t3'],['la pobreza','la pauvreté','t3'],['el paro / el desempleo','le chômage','t3'],['la violencia','la violence','t3'],['el narcotráfico','le narcotrafic','t3'],['la corrupción','la corruption','t3'],['el refugiado','le réfugié','t3'],['emigrar','émigrer','t3'],['la deuda','la dette','t3'],['las remesas','les envois d’argent des migrants','t3'],['la diáspora','la diaspora','t3'],['los hispanohablantes','les hispanophones','t3'],['las redes sociales','les réseaux sociaux','t3']];
+const VN={conn:'<p><i>Para que</i> est toujours suivi du subjonctif. <i>Aunque</i> : indicatif pour un fait réel, subjonctif pour une hypothèse ou une concession. <i>A pesar de</i> est suivi d’un nom ou d’un infinitif.</p>',avis:'<p><i>Creo que</i> + indicatif ; <i>no creo que</i> + subjonctif. Comme <i>dudo que</i> et <i>no estoy seguro de que</i>.</p>',anal:'<p>Pour analyser un document, utilise le présent : <i>El autor denuncia…</i>, <i>La imagen muestra…</i>.</p>',soc:'',t1:'<p>Axes du programme : <i>Nature et mythologies</i> ; <i>Les représentations du réel</i> ; <i>Du type au stéréotype : construction et dépassement</i>.</p>',t2:'<p>Axes du programme : <i>Oppression, résistances et révoltes</i> ; <i>Révolutions et ruptures</i> ; <i>Culture officielle et émancipations culturelles</i>.</p>',t3:'<p>Axes du programme : <i>Monde globalisé : contacts et influences</i> ; <i>Crises et violences</i> ; <i>La frontière en question</i>.</p>'};
+MODS[1]={id:'voc',name:'Vocabulaire et connecteurs',icon:'📚',desc:'Connecteurs, analyse et 3 thématiques du programme · '+VOC.length+' entrées',
+ filters:[{id:'g',label:'Thèmes',multi:1,items:VG},{id:'d',label:'Sens',items:[['fr','Français → espagnol'],['es','Espagnol → français'],['mix','Mélange']]}],
+ gen(sel){const it=VOC.filter(x=>sel.g.includes(x[2]));
+  return()=>{const x=rnd(it),d=sel.d=='mix'?rnd(['fr','es']):sel.d,f=d=='fr',a=f?x[0]:x[1],p=f?x[1]:x[0],gl=VG.find(g=>g[0]==x[2])[1];
+   return{p,sm:p.length>16,s:gl,h:f?'Comment dit-on en espagnol ?':'Que signifie… ?',pr:f?'en español':'en français',a,tag:'voc_'+x[2],tl:gl,
+    ds:()=>shuf(VOC.filter(y=>y!=x)).sort((u,v)=>(v[2]==x[2])-(u[2]==x[2])).map(y=>f?y[0]:y[1]).filter((z,j,ar)=>z!=a&&ar.indexOf(z)==j).slice(0,3)}}}};
+MODS[1].lessons=VG.map(([k,l])=>({id:k,g:'Listes de vocabulaire',t:l,h:VN[k]+tb(['Espagnol','Français'],VOC.filter(x=>x[2]==k).map(x=>[x[0],x[1]]))}));
+
+/* ============ ÉTAT, XP, BADGES ============ */
+const KEY='espanol_llc_v1';let S;try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+S=Object.assign({xp:0,ok:0,n:0,streak:0,last:'',best:[],st:{},bd:[],mc:0,fl:{}},S||{});
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const lvl=x=>Math.floor(Math.sqrt(x/50))+1,LN=['Novato','Aprendiz','Estudiante','Intermedio','Avanzado','Maestro','Leyenda'],
+curStreak=()=>S.last==ymd(new Date())||S.last==ymd(new Date(Date.now()-864e5))?S.streak:0;
+const BADGES=[
+['first','Primer paso','Une première bonne réponse',()=>S.ok>=1],
+['c100','Centurión','100 bonnes réponses',()=>S.ok>=100],
+['c500','Maratón','500 bonnes réponses',()=>S.ok>=500],
+['s3','Constante','3 jours de suite',()=>S.streak>=3],
+['s7','Semana perfecta','7 jours de suite',()=>S.streak>=7],
+['perf','Sin fallos','10/10 en QCM ou saisie',()=>S.fl.perf],
+['c10','En llamas','10 bonnes réponses d’affilée',()=>S.mc>=10],
+['speed','Relámpago','15 bonnes réponses en défi 60 s',()=>S.fl.speed],
+['l5','Avanzado','Atteindre le niveau 5',()=>lvl(S.xp)>=5],
+['sub','Maestro del subjuntivo','30 bonnes réponses au subjonctif',()=>((S.st.subj||{}).o||0)+((S.st.isubj||{}).o||0)>=30]];
+const MODES=[['qcm','QCM','4 choix · 5 vies'],['type','Saisie','Écris la forme · 5 vies'],['card','Cartes','Retourne, puis auto-évalue'],['time','Défi 60 s','QCM chrono · XP ×1,5']],MN=Object.fromEntries(MODES.map(m=>[m[0],m[1]]));
+
+/* ============ ÉCRANS ============ */
+let V='home',CF={mod:null,sel:{},mode:'qcm'},G=null,PV='home',LID=null;
+function setMod(id){CF.mod=id;CF.sel={};M().filters.forEach(f=>CF.sel[f.id]=f.multi?f.items.map(x=>x[0]):f.items[0][0])}
+const M=()=>MODS.find(m=>m.id==CF.mod),on=(f,k)=>f.multi?CF.sel[f.id].includes(k):CF.sel[f.id]==k;
+const ready=()=>M().filters.every(f=>!f.multi||CF.sel[f.id].length);
+function head(){const l=lvl(S.xp),a=50*(l-1)**2,b=50*l*l;
+ return`<div class="top"><div class="logo" data-a="home">¡A repasar!</div><div class="xp"><div class="pill">Nv ${l} · ${LN[Math.min(l-1,LN.length-1)]} · ${S.xp} XP</div><div class="bar"><i style="width:${(S.xp-a)/(b-a)*100}%"></i></div></div><div class="pill">🔥 ${curStreak()}</div><button class="btn mini" data-a="prof">Profil</button></div>`}
+const home=()=>'<h2>Que veux-tu réviser ?</h2>'+MODS.map(m=>`<button class="btn mod" ${m.soon?'disabled':`data-a="mod" data-v="${m.id}"`}><b>${m.icon} ${m.name}</b><br><span class="mut">${m.desc}</span></button>`).join('')+'<h2>Fiches leçons</h2>'+MODS.filter(m=>m.lessons).map(m=>`<button class="btn mod" data-a="lec" data-v="${m.id}"><b>📖 ${m.name}</b><br><span class="mut">${m.lessons.length} fiches : règles, tableaux, exemples</span></button>`).join('');
+const fiche=id=>((M()||{}).lessons||[]).find(l=>l.id==id);
+function lec(){const m=M();
+ return`<h2>📖 Fiches · ${m.name}</h2>`+[...new Set(m.lessons.map(l=>l.g))].map(g=>`<div class="card"><b>${g}</b><div class="chips">${m.lessons.filter(l=>l.g==g).map(l=>`<button class="btn chip" data-a="fic" data-k="${l.id}" data-pv="lec">${l.t}</button>`).join('')}</div></div>`).join('')}
+function fic(){const m=M(),L=m.lessons,i=L.findIndex(l=>l.id==LID),l=L[i],nv=(x,a)=>x?`<button class="btn mini" data-a="fic" data-k="${x.id}" data-pv="${PV}">${a?'':'← '}${x.t}${a?' →':''}</button>`:'<span></span>';
+ return`<div class="row" style="margin-top:14px"><button class="btn mini" data-a="back">← Retour</button><span class="mut">${l.g}</span></div><h2>${l.t}</h2><div class="card fiche">${l.h}</div>`
+ +(m.filters[0].items.some(x=>x[0]==l.id)?`<button class="btn go" data-a="train" data-k="${l.id}">S’entraîner sur cette fiche</button>`:'')
+ +`<div class="row" style="margin-top:14px">${nv(L[i-1])}${nv(L[i+1],1)}</div>`}
+function cfg(){const m=M();
+ return`<div class="row"><h2>${m.icon} ${m.name}</h2>${m.lessons?`<button class="btn mini" data-a="lec" data-v="${m.id}">📖 Fiches</button>`:''}</div>`+m.filters.map(f=>`<div class="card"><div class="row"><b>${f.label}</b>${f.multi?`<span><button class="lnk" data-a="all" data-f="${f.id}">Tout</button> <button class="lnk" data-a="none" data-f="${f.id}">Aucun</button></span>`:''}</div><div class="chips">${f.items.map(([k,l])=>`<button class="btn chip ${on(f,k)?'on':''}" data-a="tog" data-f="${f.id}" data-k="${k}">${l}</button>`).join('')}</div></div>`).join('')
+ +`<div class="card"><b>Type d’exercice</b><div class="grid">${MODES.map(([k,l,d])=>`<button class="btn ${CF.mode==k?'on':''}" data-a="mode" data-k="${k}"><b>${l}</b><br><small>${d}</small></button>`).join('')}</div></div><button class="btn go" data-a="play" ${ready()?'':'disabled'}>Jouer</button>`}
+function play(){const g=G,q=g.q,lv=g.mode=='qcm'||g.mode=='type';
+ let h=`<div class="row" style="margin-top:14px"><span class="hearts">${lv?'♥'.repeat(g.lives)+'♡'.repeat(5-g.lives):''}</span><span class="mut">${g.mode=='time'?`<b id="tm">${g.left}</b> s`:`${g.n+1}/${g.max}`}</span><b>+${g.xp} XP${g.combo>1?' · ×'+g.combo:''}</b></div>`;
+ h+=`<div class="card ${g.res?(g.res.ok?'good':'wrong'):''}"><div class="mut">${esc(q.h)}</div><div class="verb ${q.sm?'sm':''}">${esc(q.p)}</div><div class="mut">${esc(q.s)}</div>`;
+ if(g.mode=='qcm'||g.mode=='time')h+=`<div class="grid">${g.opts.map((o,i)=>`<button class="btn ${g.res?(o==q.a?'ok':i==g.pick?'ko':''):''}" data-a="ans" data-k="${i}" ${g.res?'disabled':''}>${esc(o)}</button>`).join('')}</div>`;
+ if(g.mode=='type')h+=`<div class="acc">${[...'áéíóúñü'].map(c=>`<button class="btn mini" data-a="acc" data-k="${c}">${c}</button>`).join('')}</div><input class="in" id="inp" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${esc(q.pr)} …" value="${esc(g.val)}" ${g.res?'readonly':''}>${g.res?'':'<button class="btn go" data-a="sub">Valider</button>'}`;
+ if(g.mode=='card')h+=g.flip?`<div class="verb" style="color:var(--ink)">${esc(q.a)}</div><div class="grid"><button class="btn" data-a="know" data-k="0">À revoir</button><button class="btn go" style="margin:0" data-a="know" data-k="1">Je savais</button></div>`:`<button class="btn go" data-a="flip">Retourner</button>`;
+ h+='</div>';
+ if(g.res&&g.mode!='card'){h+=`<div class="card ${g.res.ok?'good':'wrong'}"><b>${g.res.ok?(g.res.near?'¡Casi! Attention aux accents : ':'¡Muy bien !'):'Réponse : '}</b> ${g.res.ok&&!g.res.near?'':'<b>'+esc(q.a)+'</b>'} ${q.note?`<br><small>${esc(q.note)}</small>`:''}</div>`;
+  if(!g.res.ok)h+=(g.mode!='time'&&fiche(q.tag)?`<button class="lnk" data-a="fic" data-k="${q.tag}" data-pv="play">📖 Revoir la fiche : ${esc(q.tl)}</button>`:'')+'<button class="btn go" data-a="next">Suivant</button>'}
+ return h}
+function end(){const g=G,l=lvl(S.xp);
+ if(!g.total)return'<h2>Session vide</h2><p class="mut">Aucune réponse donnée.</p><button class="btn go" data-a="home">Accueil</button>';
+ return`<h2>${g.lives<=0?'Plus de vies…':'Session terminée'}</h2><div class="card"><div class="verb">+${g.xp} XP</div><div>${g.ok}/${g.total} bonnes réponses · série max ×${g.mc}</div>${g.up?`<p><b>Niveau ${l} atteint : ${LN[Math.min(l-1,LN.length-1)]} !</b></p>`:''}${g.nb.map(b=>`<p>🏅 <b>Nouveau badge : ${b[1]}</b> <small>${b[2]}</small></p>`).join('')}</div>`
+ +(g.miss.length?`<div class="card"><b>À retenir</b><ul>${g.miss.slice(0,8).map(q=>`<li>${esc(q.p)} · ${esc(q.pr)} → <b>${esc(q.a)}</b> <small>(${esc(q.tl)})</small></li>`).join('')}</ul>${[...new Set(g.miss.map(q=>q.tag))].filter(fiche).map(t=>`<button class="lnk" data-a="fic" data-k="${t}" data-pv="end">📖 ${esc(S.st[t].l)}</button> `).join('')}</div>`:'')
+ +`<div class="grid"><button class="btn go" style="margin:0" data-a="play">Rejouer</button><button class="btn" data-a="mod" data-v="${CF.mod}">Réglages</button></div>`}
+function prof(){const l=lvl(S.xp),st=Object.values(S.st).filter(s=>s.n>=3).sort((a,b)=>a.o/a.n-b.o/b.n);
+ return`<h2>Ton profil</h2><div class="card"><b>Niveau ${l} · ${LN[Math.min(l-1,LN.length-1)]}</b><br>${S.xp} XP · ${S.ok}/${S.n} bonnes réponses · série de ${curStreak()} jour(s)</div>
+<h2>Badges</h2><div class="grid">${BADGES.map(b=>{const e=S.bd.includes(b[0]);return`<div class="card ${e?'':'lock'}"><b>${e?'🏅':'🔒'} ${b[1]}</b><br><small>${b[2]}</small></div>`}).join('')}</div>
+<h2>Classement perso</h2><div class="card">${S.best.length?`<ol>${S.best.map(b=>`<li><b>${b.sc} XP</b> · ${MN[b.m]} · ${b.ok}/${b.n} <small>${b.d}</small></li>`).join('')}</ol>`:'<span class="mut">Joue une session pour apparaître ici.</span>'}</div>
+<h2>Réussite par thème <small>(du plus faible au plus fort)</small></h2><div class="card">${st.length?st.map(s=>`<div class="row"><span>${esc(s.l)}</span><b>${Math.round(100*s.o/s.n)} %</b></div><div class="bar b2"><i style="width:${100*s.o/s.n}%"></i></div>`).join(''):'<span class="mut">Pas encore assez de réponses (3 minimum par thème).</span>'}</div>
+<button class="btn" data-a="reset">Réinitialiser ma progression</button>`}
+function render(){if(V=='play'&&G.mode=='type'&&!G.res){const i=$('#inp');if(i)G.val=i.value}
+ $('#hd').innerHTML=head();$('#app').innerHTML={home,cfg,play,end,prof,lec,fic}[V]();
+ const i=$('.in');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}}
+
+/* ============ JEU ============ */
+const nz=s=>s.trim().toLowerCase().replace(/\s+/g,' ').replace(/'/g,'’'),dc=s=>nz(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+function check(v,a){const A=a.split(' / ').flatMap(x=>[x,x.replace(/^(me|te|se|nos|os) /,'')]);return A.some(x=>nz(x)==nz(v))?[1,0]:A.some(x=>dc(x)==dc(v))?[1,1]:[0,0]}
+const stop=()=>{if(G){clearTimeout(G.tm);clearInterval(G.iv)}};
+function newQ(){const g=G;g.q=g.gen();g.res=null;g.flip=0;g.val='';if(g.mode=='qcm'||g.mode=='time')g.opts=shuf([g.q.a,...g.q.ds()])}
+function start(){const m=M(),sel={};m.filters.forEach(f=>sel[f.id]=CF.sel[f.id]);stop();
+ G={mode:CF.mode,gen:m.gen(sel),n:0,max:10,lives:5,ok:0,total:0,xp:0,combo:0,mc:0,miss:[],left:60,done:0};newQ();
+ if(G.mode=='time')G.iv=setInterval(()=>{G.left--;const t=$('#tm');if(t)t.textContent=G.left;if(G.left<=0)finish()},1000);
+ V='play'}
+function answer(ok,near){const g=G;if(g.res||g.done)return;g.res={ok,near};g.total++;S.n++;
+ const s=S.st[g.q.tag]=S.st[g.q.tag]||{l:g.q.tl,o:0,n:0};s.n++;
+ if(ok){g.ok++;S.ok++;s.o++;g.xp+=Math.round((g.mode=='card'?6:10+2*Math.min(g.combo,5))*(g.mode=='time'?1.5:1)*(near?.5:1));g.combo++;g.mc=Math.max(g.mc,g.combo);S.mc=Math.max(S.mc,g.mc)}
+ else{g.combo=0;g.miss.push(g.q);if(g.mode=='qcm'||g.mode=='type')g.lives--}
+ if(g.mode=='card')return next();
+ if(g.mode=='time'||ok)g.tm=setTimeout(()=>{next();render()},ok?(near?1700:650):1200)}
+function next(){const g=G;clearTimeout(g.tm);if(g.done)return;g.n++;
+ if(g.mode=='time'?g.left<=0:(g.n>=g.max||g.lives<=0))return finish();newQ()}
+function finish(){const g=G;if(g.done)return;g.done=1;stop();g.nb=[];g.up=0;
+ if(g.total){const l0=lvl(S.xp),t=ymd(new Date()),y=ymd(new Date(Date.now()-864e5));S.xp+=g.xp;
+  if(S.last!=t){S.streak=S.last==y?S.streak+1:1;S.last=t}
+  S.best.push({d:t,m:g.mode,sc:g.xp,ok:g.ok,n:g.total});S.best.sort((a,b)=>b.sc-a.sc);S.best=S.best.slice(0,10);
+  if((g.mode=='qcm'||g.mode=='type')&&g.total==10&&g.ok==10)S.fl.perf=1;if(g.mode=='time'&&g.ok>=15)S.fl.speed=1;
+  g.nb=BADGES.filter(b=>!S.bd.includes(b[0])&&b[3]()).map(b=>(S.bd.push(b[0]),b));g.up=lvl(S.xp)>l0;save()}
+ V='end';render()}
+function dispatch(a,d){
+ const A={home(){stop();V='home'},prof(){stop();V='prof'},
+ mod(){stop();setMod(d.v);V='cfg'},lec(){stop();if(d.v)setMod(d.v);V='lec'},fic(){PV=d.pv||'lec';LID=d.k;V='fic'},back(){V=PV},
+ train(){CF.sel[M().filters[0].id]=[d.k];V='cfg'},
+ tog(){const f=M().filters.find(x=>x.id==d.f);if(f.multi){const s=CF.sel[f.id];s.includes(d.k)?s.splice(s.indexOf(d.k),1):s.push(d.k)}else CF.sel[f.id]=d.k},
+ all(){CF.sel[d.f]=M().filters.find(x=>x.id==d.f).items.map(x=>x[0])},none(){CF.sel[d.f]=[]},
+ mode(){CF.mode=d.k},play(){start()},
+ ans(){G.pick=+d.k;answer(G.opts[G.pick]==G.q.a)},
+ sub(){const v=$('#inp').value;if(!v.trim())return;G.val=v;const[o,n]=check(v,G.q.a);answer(!!o,!!n)},
+ acc(){G.val=$('#inp').value+d.k},
+ next(){next()},flip(){G.flip=1},know(){answer(d.k=='1')},
+ reset(){if(confirm('Effacer toute ta progression ?')){S=Object.assign({},{xp:0,ok:0,n:0,streak:0,last:'',best:[],st:{},bd:[],mc:0,fl:{}});save()}}};
+ A[a]();render();if(a=='fic'||a=='lec'||a=='back')scrollTo(0,0)}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-a]');if(b&&!b.disabled)dispatch(b.dataset.a,b.dataset)});
+document.addEventListener('keydown',e=>{if(e.key!='Enter'||V!='play'||G.done)return;
+ if(G.res&&G.mode!='card'){dispatch('next',{});e.preventDefault()}else if(G.mode=='type'&&!G.res&&document.activeElement.id=='inp'){dispatch('sub',{});e.preventDefault()}});
+render();
+})();
+</script>
+</body>
+</html>
